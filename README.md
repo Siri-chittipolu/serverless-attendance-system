@@ -62,7 +62,4 @@ For now, backend setup includes:
 - IAM roles for Lambda execution
 - DynamoDB table for attendance logs
 
----
-
-## Architecture (Simplified)
 
