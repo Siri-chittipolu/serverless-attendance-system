@@ -1,12 +1,11 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 
 function WebcamCapture({ onCapture }) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const [capturedImage, setCapturedImage] = useState(null);
 
-  // Start webcam
-  React.useEffect(() => {
+  useEffect(() => {
     navigator.mediaDevices.getUserMedia({ video: true })
       .then(stream => {
         videoRef.current.srcObject = stream;
@@ -31,11 +30,26 @@ function WebcamCapture({ onCapture }) {
   };
 
   return (
-    <div>
-      <video ref={videoRef} style={{ width: '320px', height: '240px' }} />
-      <button onClick={capturePhoto}>Capture Photo</button>
+    <div className="p-4 rounded-xl shadow-xl bg-white w-fit mx-auto text-center">
+      <video
+        ref={videoRef}
+        className="rounded-md border border-gray-300 shadow-sm mb-4"
+        style={{ width: '320px', height: '240px' }}
+      />
+      <button
+        onClick={capturePhoto}
+        className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition"
+      >
+        📸 Capture Photo
+      </button>
       <canvas ref={canvasRef} style={{ display: 'none' }} />
-      {capturedImage && <img src={capturedImage} alt="Captured" />}
+      {capturedImage && (
+        <img
+          src={capturedImage}
+          alt="Captured"
+          className="mt-4 rounded border border-gray-200"
+        />
+      )}
     </div>
   );
 }
