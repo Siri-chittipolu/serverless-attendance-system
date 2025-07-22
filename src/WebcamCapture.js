@@ -8,8 +8,16 @@ function WebcamCapture({ onCapture }) {
   useEffect(() => {
     navigator.mediaDevices.getUserMedia({ video: true })
       .then(stream => {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play();
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+
+          // Wait for metadata before playing video to avoid play() interruption error
+          videoRef.current.onloadedmetadata = () => {
+            videoRef.current.play().catch(err => {
+              console.warn('⚠️ Video play interrupted:', err);
+            });
+          };
+        }
       })
       .catch(err => console.error('Error accessing webcam:', err));
   }, []);
@@ -30,15 +38,17 @@ function WebcamCapture({ onCapture }) {
   };
 
   return (
-    <div className="p-4 rounded-xl shadow-xl bg-white w-fit mx-auto text-center">
+    <div className="max-w-sm mx-auto bg-white rounded-3xl shadow-2xl p-6 flex flex-col items-center">
       <video
         ref={videoRef}
-        className="rounded-md border border-gray-300 shadow-sm mb-4"
-        style={{ width: '320px', height: '240px' }}
+        className="rounded-2xl border-4 border-indigo-500 shadow-lg mb-6 w-full aspect-video object-cover"
+        playsInline
+        muted
       />
       <button
         onClick={capturePhoto}
-        className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition"
+        className="w-full py-3 rounded-full bg-indigo-600 text-white font-bold text-lg hover:bg-indigo-700 transition-colors shadow-md active:scale-95 transform focus:outline-none focus:ring-4 focus:ring-indigo-300"
+        aria-label="Capture Photo"
       >
         📸 Capture Photo
       </button>
@@ -47,7 +57,7 @@ function WebcamCapture({ onCapture }) {
         <img
           src={capturedImage}
           alt="Captured"
-          className="mt-4 rounded border border-gray-200"
+          className="mt-8 rounded-3xl border-4 border-indigo-300 shadow-xl w-full max-h-64 object-contain"
         />
       )}
     </div>

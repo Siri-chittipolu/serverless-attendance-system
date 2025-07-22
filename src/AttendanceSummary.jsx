@@ -25,26 +25,45 @@ const AttendanceSummary = () => {
       });
   }, []);
 
-  if (loading) return <p>Loading attendance summary...</p>;
-  if (error) return <p className="text-red-600">Error: {error}</p>;
-  if (!summary) return <p>No attendance data available.</p>;
+  if (loading)
+    return (
+      <p className="text-center text-gray-600 mt-10 text-lg">
+        Loading attendance summary...
+      </p>
+    );
+  if (error)
+    return (
+      <p className="text-center text-red-600 mt-10 font-semibold">
+        Error: {error}
+      </p>
+    );
+  if (!summary)
+    return (
+      <p className="text-center text-gray-500 mt-10">
+        No attendance data available.
+      </p>
+    );
 
   // Check if summary has employeeId and weeklyAttendanceCount properties
   if (summary.employeeId && summary.weeklyAttendanceCount !== undefined) {
     return (
-      <div className="p-4">
-        <h2 className="text-xl font-bold mb-4">Attendance Summary</h2>
-        <table className="w-full border border-collapse">
+      <div className="max-w-md mx-auto bg-white shadow-lg rounded-lg p-6 mt-10">
+        <h2 className="text-2xl font-bold mb-6 text-indigo-700 text-center">
+          Attendance Summary
+        </h2>
+        <table className="w-full table-auto border border-gray-300 rounded-md">
           <thead>
-            <tr className="bg-gray-100">
-              <th className="border px-2 py-1">Employee ID</th>
-              <th className="border px-2 py-1">Weekly Attendance Count</th>
+            <tr className="bg-indigo-100 text-indigo-700">
+              <th className="border px-4 py-2 text-left">Employee ID</th>
+              <th className="border px-4 py-2 text-left">
+                Weekly Attendance Count
+              </th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td className="border px-2 py-1">{summary.employeeId}</td>
-              <td className="border px-2 py-1">{summary.weeklyAttendanceCount}</td>
+            <tr className="hover:bg-indigo-50 transition-colors duration-200">
+              <td className="border px-4 py-2">{summary.employeeId}</td>
+              <td className="border px-4 py-2">{summary.weeklyAttendanceCount}</td>
             </tr>
           </tbody>
         </table>
@@ -55,27 +74,36 @@ const AttendanceSummary = () => {
   // If summary is an array of entries (like older formats)
   if (Array.isArray(summary)) {
     if (summary.length === 0) {
-      return <p>No attendance data available.</p>;
+      return (
+        <p className="text-center text-gray-500 mt-10">
+          No attendance data available.
+        </p>
+      );
     }
     return (
-      <div className="p-4">
-        <h2 className="text-xl font-bold mb-4">Attendance Summary</h2>
-        <table className="w-full border border-collapse">
+      <div className="max-w-4xl mx-auto p-6 mt-10 bg-white shadow-md rounded-lg">
+        <h2 className="text-2xl font-bold mb-6 text-indigo-700 text-center">
+          Attendance Summary
+        </h2>
+        <table className="w-full table-auto border border-gray-300 rounded-md">
           <thead>
-            <tr className="bg-gray-100">
-              <th className="border px-2 py-1">Employee ID</th>
-              <th className="border px-2 py-1">Name</th>
-              <th className="border px-2 py-1">Time</th>
-              <th className="border px-2 py-1">Status</th>
+            <tr className="bg-indigo-100 text-indigo-700">
+              <th className="border px-4 py-2 text-left">Employee ID</th>
+              <th className="border px-4 py-2 text-left">Name</th>
+              <th className="border px-4 py-2 text-left">Time</th>
+              <th className="border px-4 py-2 text-left">Status</th>
             </tr>
           </thead>
           <tbody>
             {summary.map((entry, idx) => (
-              <tr key={idx}>
-                <td className="border px-2 py-1">{entry.employeeId}</td>
-                <td className="border px-2 py-1">{entry.employeeName}</td>
-                <td className="border px-2 py-1">{entry.time}</td>
-                <td className="border px-2 py-1">{entry.status}</td>
+              <tr
+                key={idx}
+                className="hover:bg-indigo-50 transition-colors duration-200"
+              >
+                <td className="border px-4 py-2">{entry.employeeId}</td>
+                <td className="border px-4 py-2">{entry.employeeName}</td>
+                <td className="border px-4 py-2">{entry.time}</td>
+                <td className="border px-4 py-2">{entry.status}</td>
               </tr>
             ))}
           </tbody>
@@ -88,40 +116,49 @@ const AttendanceSummary = () => {
   if (summary && typeof summary === "object") {
     const dates = Object.keys(summary);
     if (dates.length === 0) {
-      return <p>No attendance data available.</p>;
+      return (
+        <p className="text-center text-gray-500 mt-10">
+          No attendance data available.
+        </p>
+      );
     }
     return (
-      <div className="p-4">
-        <h2 className="text-xl font-bold mb-4">Attendance Summary</h2>
+      <div className="max-w-4xl mx-auto p-6 mt-10 bg-white shadow-md rounded-lg">
+        <h2 className="text-2xl font-bold mb-6 text-indigo-700 text-center">
+          Attendance Summary
+        </h2>
         {dates.map((date) => {
           const entries = summary[date];
           if (!Array.isArray(entries) || entries.length === 0) {
             return (
               <div key={date} className="mb-6">
-                <h3 className="font-semibold text-lg mb-2">{date}</h3>
-                <p>No attendance data available for this date.</p>
+                <h3 className="font-semibold text-lg mb-2 text-indigo-600">{date}</h3>
+                <p className="text-gray-500">No attendance data available for this date.</p>
               </div>
             );
           }
           return (
-            <div key={date} className="mb-6">
-              <h3 className="font-semibold text-lg mb-2">{date}</h3>
-              <table className="w-full border border-collapse">
+            <div key={date} className="mb-8">
+              <h3 className="font-semibold text-lg mb-2 text-indigo-600">{date}</h3>
+              <table className="w-full table-auto border border-gray-300 rounded-md">
                 <thead>
-                  <tr className="bg-gray-100">
-                    <th className="border px-2 py-1">Employee ID</th>
-                    <th className="border px-2 py-1">Name</th>
-                    <th className="border px-2 py-1">Time</th>
-                    <th className="border px-2 py-1">Status</th>
+                  <tr className="bg-indigo-100 text-indigo-700">
+                    <th className="border px-4 py-2 text-left">Employee ID</th>
+                    <th className="border px-4 py-2 text-left">Name</th>
+                    <th className="border px-4 py-2 text-left">Time</th>
+                    <th className="border px-4 py-2 text-left">Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {entries.map((entry, idx) => (
-                    <tr key={idx}>
-                      <td className="border px-2 py-1">{entry.employeeId}</td>
-                      <td className="border px-2 py-1">{entry.employeeName}</td>
-                      <td className="border px-2 py-1">{entry.time}</td>
-                      <td className="border px-2 py-1">{entry.status}</td>
+                    <tr
+                      key={idx}
+                      className="hover:bg-indigo-50 transition-colors duration-200"
+                    >
+                      <td className="border px-4 py-2">{entry.employeeId}</td>
+                      <td className="border px-4 py-2">{entry.employeeName}</td>
+                      <td className="border px-4 py-2">{entry.time}</td>
+                      <td className="border px-4 py-2">{entry.status}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -134,7 +171,11 @@ const AttendanceSummary = () => {
   }
 
   // Default fallback
-  return <p>No attendance data available.</p>;
+  return (
+    <p className="text-center text-gray-500 mt-10">
+      No attendance data available.
+    </p>
+  );
 };
 
 export default AttendanceSummary;

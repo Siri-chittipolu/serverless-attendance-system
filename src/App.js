@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import './index.css';
 import WebcamCapture from './WebcamCapture';
-import AttendanceSummary from './AttendanceSummary'; // 👈 Import the summary component
+import AttendanceSummary from './AttendanceSummary';
+import { FaCamera, FaChartBar } from 'react-icons/fa';
 
 const API_BASE_URL = {
   upload: "https://xxgqw1jz04.execute-api.ap-south-1.amazonaws.com/prod",
@@ -11,18 +13,15 @@ function App() {
   const [photoBlob, setPhotoBlob] = useState(null);
   const [statusMessage, setStatusMessage] = useState('');
   const [isChecking, setIsChecking] = useState(false);
-  const [showSummary, setShowSummary] = useState(false); // 👈 Toggle state
+  const [showSummary, setShowSummary] = useState(false);
 
   const handleCapture = async (blob) => {
     setPhotoBlob(blob);
     setStatusMessage('📤 Uploading...');
 
     try {
-      console.log("🔄 Requesting pre-signed URL...");
       const res = await fetch(`${API_BASE_URL.upload}/GeneratePresignedURL`);
       const data = await res.json();
-      console.log("✅ Pre-signed URL response:", data);
-
       const uploadResult = await fetch(data.uploadURL, {
         method: 'PUT',
         headers: { 'Content-Type': 'image/jpeg' },
@@ -31,7 +30,6 @@ function App() {
 
       if (uploadResult.ok) {
         setStatusMessage("✅ Uploaded successfully. Checking attendance...");
-        console.log("📤 Image uploaded, key:", data.key);
         await pollAttendanceStatus(data.key);
       } else {
         setStatusMessage(`❌ Upload failed. Status: ${uploadResult.status}`);
@@ -55,7 +53,6 @@ function App() {
         try {
           const res = await fetch(`${API_BASE_URL.status}/getAttendanceStatus?imageKey=${encodeURIComponent(imageKey)}`);
           const data = await res.json();
-          console.log("🔁 Polling attempt", attempts, "→", data);
 
           if (data.status === "Present") {
             setStatusMessage(`✅ Marked Present: ${data.employeeName}`);
@@ -85,39 +82,40 @@ function App() {
           setIsChecking(false);
           resolve(false);
         }
-      }, 2000); // every 2 seconds
+      }, 2000);
     });
   };
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'Arial' }}>
-      <h1>📝 Attendance System</h1>
+    <div className="min-h-screen bg-gray-100 text-gray-900 p-6">
+      <div className="max-w-2xl mx-auto bg-white shadow-xl rounded-xl p-6 space-y-6">
+        <h1 className="text-3xl font-bold text-center text-indigo-600">📝 Attendance System</h1>
 
-      <button
-        onClick={() => setShowSummary(!showSummary)}
-        style={{
-          marginBottom: '20px',
-          padding: '10px 20px',
-          background: '#4f46e5',
-          color: '#fff',
-          border: 'none',
-          borderRadius: '8px',
-          cursor: 'pointer'
-        }}
-      >
-        {showSummary ? "📸 Switch to Photo Upload" : "📊 View Attendance Summary"}
-      </button>
+        <button
+          onClick={() => setShowSummary(!showSummary)}
+          className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition"
+        >
+          {showSummary ? <FaCamera /> : <FaChartBar />}
+          {showSummary ? "Switch to Photo Upload" : "View Attendance Summary"}
+        </button>
 
-      {showSummary ? (
-        <AttendanceSummary />
-      ) : (
-        <>
-          <WebcamCapture onCapture={handleCapture} />
-          {photoBlob && <p>📸 Photo captured!</p>}
-          {statusMessage && <p><strong>{statusMessage}</strong></p>}
-          {isChecking && <p>⏳ Polling attendance status...</p>}
-        </>
-      )}
+        {showSummary ? (
+          <AttendanceSummary />
+        ) : (
+          <>
+            <WebcamCapture onCapture={handleCapture} />
+            {photoBlob && (
+              <p className="text-green-600 font-medium mt-3">📸 Photo captured!</p>
+            )}
+            {statusMessage && (
+              <p className="font-semibold mt-2">{statusMessage}</p>
+            )}
+            {isChecking && (
+              <p className="text-yellow-600 animate-pulse">⏳ Polling attendance status...</p>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }
